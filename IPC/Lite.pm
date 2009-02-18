@@ -5,7 +5,7 @@ package IPC::Lite;
 # but shared memory is sketchy at best, whereas SQLite works
 # on most platforms
 
-our $VERSION = '0.1.' . [qw$Revision: 21 $]->[1];
+our $VERSION = '0.1.' . [qw$Revision: 17 $]->[1];
 
 use warnings::register;
 use strict;
@@ -778,7 +778,7 @@ __END__
 
 =head1 NAME
 
-IPC::Lite - Share variables between processes
+IPC::Lite - share variables between processes in a platform neutral way
 
 =head1 SYNOPSIS
 
