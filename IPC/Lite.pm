@@ -5,7 +5,7 @@ package IPC::Lite;
 # but shared memory is sketchy at best, whereas SQLite works
 # on most platforms
 
-our $VERSION = '0.1.' . [qw$Revision: 17 $]->[1];
+our $VERSION = '0.1.' . [qw$Revision: 22 $]->[1];
 
 use warnings::register;
 use strict;
@@ -768,6 +768,11 @@ sub threadid {
 		Win32::GetCurrentThreadId();
 	};
 	}
+
+	if (!$tid) {
+		#this fixes forking issues on older perls
+		$tid = $$;
+	}
 	
 	return $tid;
 }
@@ -778,7 +783,7 @@ __END__
 
 =head1 NAME
 
-IPC::Lite - share variables between processes in a platform neutral way
+IPC::Lite - Share variables between processes
 
 =head1 SYNOPSIS
 
