@@ -1,7 +1,7 @@
 # http://module-build.sourceforge.net/META-spec.html
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         IPC-Lite
-version:      0.1.23
+version:      0.1.26
 version_from: IPC/Lite.pm
 installdirs:  site
 requires:

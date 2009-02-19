@@ -5,7 +5,7 @@ package IPC::Lite;
 # but shared memory is sketchy at best, whereas SQLite works
 # on most platforms
 
-our $VERSION = '0.1.' . [qw$Revision: 23 $]->[1];
+our $VERSION = '0.1.' . [qw$Revision: 26 $]->[1];
 
 use warnings::register;
 use strict;
@@ -787,25 +787,33 @@ IPC::Lite - Share variables between processes
 
 =head1 SYNOPSIS
 
-Create package global shared variables named "count" and "stack"
+Simple example creates package global shared variables named "count" and "stack".
 
  use IPC::Lite qw($count, @stack);
 
-Create shared variable "temp", with a 5 second timeout
-
-Uses 'globaltemp-v1' as the program key, so other programs with this key 
-will also be able to access the scalar 'temp' variable
+Example of a shared variable "temp", with a 5 second timeout.  
+Uses 'globaltemp-v1' as the program key, so other programs with this key  
+will also be able to access $temp.
 
  use IPC::Lite Key=>'globaltemp-v1', Timeout=>5, qw($temp);
-
- if ($ARGV[0] eq '-del') {
-        $temp = undef;
-        shift;
- }
 
  $temp = $ARGV[0] if $ARGV[0];
 
  print "temp is: $temp\n";
+
+This example shows the power of using this module for IPC:
+
+ use IPC::Lite qw($c);
+ $c = undef;
+
+ my $pid = fork;
+
+ if ($pid) {
+        wait;
+	print "Child told me $c\n";
+ } else {
+	$c = "hello!";
+ }
 
 =head1 METHODS
 
