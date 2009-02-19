@@ -5,7 +5,7 @@ package IPC::Lite;
 # but shared memory is sketchy at best, whereas SQLite works
 # on most platforms
 
-our $VERSION = '0.1.' . [qw$Revision: 22 $]->[1];
+our $VERSION = '0.1.' . [qw$Revision: 23 $]->[1];
 
 use warnings::register;
 use strict;

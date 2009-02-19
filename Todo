@@ -1,0 +1,8 @@
+TODO:
+
+1. Add a "transact" function which allows for multiple IPC::Lite edits atomically.
+
+2. Change timeouts to work on a per-value level, not per-variable.
+
+3. Create more forking tests that run in tight loops and try to break things.
+
