@@ -1,11 +1,11 @@
 package IPC::Lite;
 
 # Combination of vars.pm, Tie::DBI, and IPC
-# wanted to called it "shared" .... ie: "use shared qw($var)"
+# Wanted to called it "shared" .... ie: "use shared qw($var)"
 # but shared memory is sketchy at best, whereas SQLite works
 # on most platforms
 
-our $VERSION = '0.1.' . [qw$Revision: 26 $]->[1];
+our $VERSION = '0.1.' . [qw$Revision: 27 $]->[1];
 
 use warnings::register;
 use strict;

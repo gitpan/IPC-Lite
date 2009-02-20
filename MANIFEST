@@ -1,4 +1,5 @@
 IPC/Lite.pm
+Makefile.PL
 MANIFEST
 README
 t/01-usevars.t
