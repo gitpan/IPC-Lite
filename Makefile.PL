@@ -4,7 +4,7 @@ use 5.006;
 
 
 WriteMakefile(
-    NAME         => 'IPC-Lite',
+    NAME         => 'IPC::Lite',
     PMLIBDIRS    => ['Games'],
     VERSION_FROM => 'IPC/Lite.pm',
     AUTHOR       => 'Erik Aronesty <earonesty@cpan.org>',
@@ -14,6 +14,7 @@ WriteMakefile(
                      'DBD::SQLite' => 0,
                      'Test::Simple' => 0,
                     },
+    PM           => {'IPC/Lite.pm'=>'$(INST_LIBDIR)/Lite.pm'},
     dist	 => {
 		     PREOP=>'pod2text IPC/Lite.pm > README'
 		    },

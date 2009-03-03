@@ -5,7 +5,7 @@ package IPC::Lite;
 # but shared memory is sketchy at best, whereas SQLite works
 # on most platforms
 
-our $VERSION = '0.1.' . [qw$Revision: 27 $]->[1];
+our $VERSION = '0.1.' . [qw$Revision: 28 $]->[1];
 
 use warnings::register;
 use strict;
@@ -708,8 +708,10 @@ sub dbexec {
 
 sub END {
 	# no refs to statement handles
-	for (values(%DBS)) {
+	for my $tid_dbs (values(%DBS)) {
+	for (values(%{$tid_dbs})) {
 		$_->{private_ipc_lite_prep} = undef;
+	}
 	}
 }
 
