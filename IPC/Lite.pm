@@ -5,7 +5,7 @@ package IPC::Lite;
 # but shared memory is sketchy at best, whereas SQLite works
 # on most platforms
 
-our $VERSION = '0.1.' . [qw$Revision: 28 $]->[1];
+our $VERSION = '0.4.' . [qw$Revision: 32 $]->[1];
 
 use warnings::register;
 use strict;
@@ -28,6 +28,7 @@ my %DBS;
 
 # this code from vars.pm, since we can't adjust the "callpack"
 sub import {
+#hereiam();
     my $callpack = caller;
     my ($pack, @imports) = @_;
     my ($sym, $ch, $sym_n);
@@ -65,7 +66,7 @@ sub import {
 		     require Carp;
 		     Carp::croak("'$_' is not a valid variable name");
 		 });
-	    eval("tie ${ch}${callpack}::$sym, '$pack', sym=>'$sym_n', \%opts;");
+	    eval("tie ${ch}${callpack}::$sym, '$pack', \%opts, sym=>'$sym_n';");
 	    if ($@) {
                     require Carp;
                     Carp::croak("'$_' problem with tie: $@");
@@ -274,12 +275,14 @@ sub cleanup {
 }
 
 sub TIESCALAR {
+#hereiam();
 	my $self = tie_var('$', @_);
         create_scalar_table($self->{db});
 	return $self;
 }
 
 sub TIEHASH {
+#hereiam();
 	my $self = tie_var('%', @_);
 	if ($self->{sym}) {
         	create_hash_table($self->{db});
@@ -293,6 +296,7 @@ sub TIEHASH {
 }
 
 sub TIEARRAY {
+#hereiam();
         my $self = tie_var('@', @_);
         if ($self->{sym}) {
                 create_array_table($self->{db});
@@ -307,6 +311,7 @@ sub TIEARRAY {
 
 
 sub canonical {
+#hereiam();
 	my ($self, $key) = @_;
 	$self->checkdb();
 	my $canon;
@@ -327,13 +332,19 @@ sub canonical {
 }
 
 sub FIRSTKEY {
+#hereiam();
 	my ($self) = @_;
 	$self->checkdb();
-        $self->{keyst} = $self->dbexec('enumkey', "select key, val, vtyp from hash where sym=?", $self->{sym});
+	if ($self->{sym}) {
+	        $self->{keyst} = $self->dbexec('enumkey', "select key, val, vtyp from hash where sym=?", $self->{sym});
+	} else {
+	        $self->{keyst} = $self->dbexec('', "select key, val, vtyp from $self->{table}");
+	}
 	return $self->NEXTKEY();
 }
 
 sub NEXTKEY {
+#hereiam();
         my ($self) = @_;
 	$self->checkdb();
 	my $row = $self->{keyst}->fetchrow_arrayref();
@@ -351,6 +362,7 @@ sub NEXTKEY {
 }
 
 sub CLEAR {
+#hereiam();
         my ($self) = @_;
 	$self->checkdb();
 	if ($self->{sym}) {
@@ -365,6 +377,7 @@ sub CLEAR {
 }
 
 sub SPLICE {
+#hereiam();
         my ($self, $offset, $length, @new) = @_;
 	$self->checkdb();
         $offset = 0 unless defined $offset;
@@ -452,6 +465,7 @@ sub FETCHSIZE {
 }
 
 sub EXTEND {
+#hereiam();
 	my ($self, $count) = @_;
 	$self->checkdb();
 	if ($count >= 0) {
@@ -537,6 +551,7 @@ sub FETCH {
 }
 
 sub tiesubrefs {
+#hereiam();
 	my ($self, $key, $val, $vtyp) = @_;
 
         return undef if ! defined $vtyp;
@@ -555,15 +570,15 @@ sub tiesubrefs {
 			my $canon = canonical($self, $key);
 			if ($val eq '$') {
 				my $var;
-				my $sub = tie $var, ref($self), sym=>$canon, %{$self};
+				my $sub = tie $var, ref($self), %{$self}, sym=>$canon;
 				$val = \$var;
 			} elsif ($val eq '%') {
 				my %var;
-                                my $sub = tie %var, ref($self), sym=>$canon, %{$self};
+				my $sub = tie %var, ref($self), %{$self}, sym=>$canon;
 				$val = \%var;
                         } elsif ($val eq '@') {
 				my @var;
-                                my $sub = tie @var, ref($self), sym=>$canon, %{$self};
+				my $sub = tie @var, ref($self), %{$self}, sym=>$canon;
 				$val = \@var;
                         } else {
 				require Carp;
@@ -577,6 +592,7 @@ sub tiesubrefs {
 }
 
 sub STORE {
+#hereiam();
 	my $self = shift;
 	$self->checkdb();
 
@@ -590,7 +606,6 @@ sub STORE {
 
 	my $vtyp;
 
-
 	if (ref($val)) {
 		$key = '' if !defined $key;
 		my $canon = canonical($self, $key);
@@ -599,17 +614,17 @@ sub STORE {
 		my $sub;
 		if (ref($val) eq 'SCALAR') {
 			my $sav = ${$val}; 
-			tie ${$val}, ref($self), sym=>$canon, %{$self};
+			tie ${$val}, ref($self), %{$self}, sym=>$canon;
 			${$val} = $sav if defined $sav;
 			$val = '$';
 		} elsif (ref($val) eq 'HASH') {
 			my %sav = %{$val}; 
-                        tie %{$val}, ref($self), sym=>$canon, %{$self};
+                        tie %{$val}, ref($self), %{$self}, sym=>$canon;
 			%{$val} = %sav if %sav;
                         $val = '%';
 		} elsif (ref($val) eq 'ARRAY') {
 			my @sav = @{$val}; 
-                        $sub = tie @{$val}, ref($self), sym=>$canon, %{$self};
+                        $sub = tie @{$val}, ref($self), %{$self}, sym=>$canon;
 			@{$val} = @sav if @sav;
                         $val = '@';
                 } else {
@@ -777,6 +792,13 @@ sub threadid {
 	}
 	
 	return $tid;
+}
+
+sub hereiam {
+	my ($package, $filename, $line, $subroutine) = caller(1);
+	print "$package $line: $subroutine (";
+	($package, $filename, $line, $subroutine) = caller(2);
+	print "$package $line: $subroutine)\n";
 }
 
 1;
