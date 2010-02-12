@@ -5,7 +5,7 @@ package IPC::Lite;
 # but shared memory is sketchy at best, whereas SQLite works
 # on most platforms
 
-our $VERSION = '0.4.' . [qw$Revision: 32 $]->[1];
+our $VERSION = '0.4.' . [qw$Revision: 33 $]->[1];
 
 use warnings::register;
 use strict;
@@ -66,7 +66,7 @@ sub import {
 		     require Carp;
 		     Carp::croak("'$_' is not a valid variable name");
 		 });
-	    eval("tie ${ch}${callpack}::$sym, '$pack', \%opts, sym=>'$sym_n';");
+	    eval("tie ${ch}$sym, '$pack', \%opts, sym=>'$sym_n';");
 	    if ($@) {
                     require Carp;
                     Carp::croak("'$_' problem with tie: $@");
