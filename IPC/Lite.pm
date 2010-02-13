@@ -5,7 +5,7 @@ package IPC::Lite;
 # but shared memory is sketchy at best, whereas SQLite works
 # on most platforms
 
-our $VERSION = '0.4.' . [qw$Revision: 33 $]->[1];
+our $VERSION = '0.4.' . [qw$Revision: 35 $]->[1];
 
 use warnings::register;
 use strict;
@@ -444,7 +444,7 @@ sub DELETE {
 		if ($self->{sym}) {
 			$self->dbexec('delhash', "delete from hash where sym=? and key=?", $self->{sym}, $key);
 		} else {
-			$self->dbexec('', "delete from $self->{table} where sym=? and key=?", $self->{sym}, $key);
+			$self->dbexec('', "delete from $self->{table} where key=?", $key);
 		}
 	} else {
 		$self->store($key, undef);
