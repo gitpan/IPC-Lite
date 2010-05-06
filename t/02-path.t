@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::Simple tests=>2;
+use Test::Simple tests=>3;
 
 BEGIN {
 	(-d 'tmp') || mkdir('tmp') || die;
@@ -25,3 +25,5 @@ ok("1,$t" eq $r, "v: $r");
 
 $r = join(',',keys(%{$obj}));
 ok('one,time' eq $r, "k: $r");
+
+ok(exists($x{one}), "exists: x{one}");

@@ -5,7 +5,7 @@ package IPC::Lite;
 # but shared memory is sketchy at best, whereas SQLite works
 # on most platforms
 
-our $VERSION = '0.4.' . [qw$Revision: 35 $]->[1];
+our $VERSION = '0.4.' . [qw$Revision: 37 $]->[1];
 
 use warnings::register;
 use strict;
@@ -519,8 +519,13 @@ sub UNSHIFT {
 }
 
 
-sub FETCH {
+sub EXISTS {
 	my ($self, $key) = @_;
+	return $self->FETCH($key, 'EXISTS');
+}
+
+sub FETCH {
+	my ($self, $key, $act) = @_;
 	$self->checkdb();
 
 	my $st;
@@ -546,6 +551,10 @@ sub FETCH {
 	}
 		
 	my ($val, $vtyp) = $st->fetchrow_array();
+
+	if (defined $act && $act eq 'EXISTS') {
+		return defined $vtyp;
+	}
 
 	return tiesubrefs($self, $key, $val, $vtyp);
 }

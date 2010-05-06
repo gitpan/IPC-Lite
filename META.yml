@@ -1,13 +1,16 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         IPC-Lite
-version:      0.4.35
-version_from: IPC/Lite.pm
-installdirs:  site
-requires:
+--- #YAML:1.0
+name:                IPC-Lite
+version:             0.4.37
+abstract:            IPC shared variables using SQLite
+license:             ~
+author:              
+    - Erik Aronesty <earonesty@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
     DBD::SQLite:                   0
     DBI:                           1.21
     Test::Simple:                  0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3
