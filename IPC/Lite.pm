@@ -5,7 +5,7 @@ package IPC::Lite;
 # but shared memory is sketchy at best, whereas SQLite works
 # on most platforms
 
-our $VERSION = '0.4.' . [qw$Revision: 37 $]->[1];
+our $VERSION = '0.5.' . [qw$Revision: 40 $]->[1];
 
 use warnings::register;
 use strict;
@@ -402,16 +402,16 @@ sub SPLICE {
 		for (my $i=($self->FETCHSIZE-1); $i >= $offset; --$i) {
 		    # constraints prevent us from doing this in 1 call to the db, consider turning them off for speed?
 		    if ($self->{sym}) {
-			$self->dbexec('arraypush', "update array set ind=ind+? where sym=? and ind = ?", scalar @new, $self->{sym}, $i);
+			$self->dbexec('arrayind', "update array set ind=ind+? where sym=? and ind = ?", scalar @new, $self->{sym}, $i);
 		    } else {
-			$self->dbexec('arraypush.' . $self->{table}, "update $self->{table} set ind=ind+? where ind = ?", scalar @new, $i);
+			$self->dbexec('arrayind.' . $self->{table}, "update $self->{table} set ind=ind+? where ind = ?", scalar @new, $i);
 		    }
 		}
 		for (; $n <= $#new; ++$n) {
 			$self->STORE($n + $offset, $new[$n]);
 		}
 	} elsif ($length > 0) {
-		for (my $i = $offset; $i < ($offset + $length); ++$i) {
+		for ( my $i = $offset ; $i < ( $offset + $length ) ; ++$i ) {
 			push @ret, $self->FETCH($i);
 		}
 		if ($self->{sym}) {
@@ -421,7 +421,8 @@ sub SPLICE {
 			$self->dbexec('', "delete from $self->{table} where ind>=? and ind < ?",
 					$offset, $offset + $length);
 		}
-		for (my $i = $offset; $i < ($offset + $length); ++$i) {
+                # shift indexes down in storage
+		for (my $i = $offset+1; $i < $self->FETCHSIZE; ++$i) {
 			if ($self->{sym}) {
 				$self->dbexec('indarray', "update array set ind=ind-? where sym=? and ind=?", 
 					$length, $self->{sym}, $i);
@@ -435,6 +436,12 @@ sub SPLICE {
 	$self->{db}->commit();
 
 	return wantarray ? @ret : $ret[@ret];
+}
+
+sub SHIFT {
+    my ($self) = @_;
+    my @val = $self->SPLICE( 0, 1 );
+    return $val[0];
 }
 
 sub DELETE {
@@ -514,7 +521,7 @@ sub PUSH {
 
 sub UNSHIFT {
         my ($self, @list) = @_;
-	$self->checkdb();
+        $self->checkdb();
         return $self->SPLICE(0, 0, @list);
 }
 
@@ -716,7 +723,7 @@ sub dbexec {
 	my $db = $self->{db} ? $self->{db} : $self;
 	my $st;
 	if ($name) {
-		if (!($st = $db->{_prepped}->{$name})) {
+		if (!($st = ($db->{private_ipc_lite_prep}||{})->{$name})) {
 			$st = $db->{private_ipc_lite_prep}->{$name} = $db->prepare($sql);
 		}
 	} else {

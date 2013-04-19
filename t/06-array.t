@@ -1,6 +1,7 @@
 use strict;
 use warnings;
-use Test::Simple tests=>18;
+use Test::Simple tests=>22;
+use Data::Dumper;
 
 # not terribly thorough test of array operators
 
@@ -54,6 +55,11 @@ ok($x[2] eq 'goodbye', "$_ 2:" . $x[2]);
 my $v = pop @x;
 
 ok($v eq 'goodbye', "$_ pop 1: " . $v);
+
+my $ret = shift @x;
+ok (@x == 1 && $x[0] eq "hello", "shift");
+ok ($ret eq "begin", "shift ret");
+
 }
 
 

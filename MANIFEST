@@ -10,4 +10,5 @@ t/05-table.t
 t/06-array.t
 t/07-mproc.t
 Todo
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
